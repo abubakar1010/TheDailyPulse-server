@@ -30,8 +30,8 @@ async function run() {
     await client.connect();
 
     const newsCollection = client.db('theDailyPulse').collection('news')
-    const usersCollection = client.db('theDailyPulse').collection('menu')
-    const publishersCollection = client.db('theDailyPulse').collection('reviews')
+    const usersCollection = client.db('theDailyPulse').collection('users')
+    const publishersCollection = client.db('theDailyPulse').collection('publishers')
 
 
     
@@ -90,6 +90,8 @@ async function run() {
           res.send(result)
         })
 
+        // insert a user
+
         app.post('/users', async(req, res) => {
 
           const user = req.body;
@@ -103,6 +105,16 @@ async function run() {
         })
     
     
+            // delete users 
+
+    app.delete('/users/:id', async(req, res) => {
+
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await cartsCollection.deleteOne(query)
+      res.send(result)
+
+    })
     
 
 
