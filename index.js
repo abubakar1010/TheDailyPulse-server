@@ -77,6 +77,18 @@ async function run() {
           res.send({token})
         })
     
+
+        // user related apis 
+
+        // get all user 
+
+
+        app.get("/users",  async(req, res) => {
+          // console.log(req.headers);
+          
+          const result = await usersCollection.find().toArray();
+          res.send(result)
+        })
     
     
 
