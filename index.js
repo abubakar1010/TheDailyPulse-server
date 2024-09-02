@@ -28,6 +28,37 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const newsCollection = client.db('theDailyPulse').collection('news')
+    const usersCollection = client.db('theDailyPulse').collection('menu')
+    const publishersCollection = client.db('theDailyPulse').collection('reviews')
+
+
+
+    // news collection related apis here 
+
+              //insert item on new
+      
+              app.post("/news", async(req, res) => {
+                const data = req.body;
+                const result = await newsCollection.insertOne(data)
+                res.send(result)
+              })
+
+
+              // get item from newsCollection
+
+                      // find all news from news collection
+      
+          app.get('/news', async(req, res) => {
+      
+            const result = await newsCollection.find().toArray()
+            res.send(result)
+        })
+
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -53,10 +84,10 @@ run().catch(console.dir);
 
 
 app.get('/', async(req, res) => {
-    res.send(`cafeteria management server is running on prot ${port}`)
+    res.send(`the daily pulse server is running on prot ${port}`)
 })
 
 app.listen(port,() => { 
-    console.log(`cafeteria management server is running on prot ${port}`)
+    console.log(`the daily pulse server is running on prot ${port}`)
     
 })
