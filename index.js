@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express();
 const port = process.env.PROT || 5000;
@@ -34,6 +34,53 @@ async function run() {
     const publishersCollection = client.db('theDailyPulse').collection('reviews')
 
 
+    
+    // jwt related apis 
+
+        // middleware 
+
+        const verifyToken = (req, res, next) => {
+          // console.log("verify token",req.headers.authorization);
+    
+          if(!req.headers.authorization){
+            return res.status(401).send({message: "unauthorized access"})
+          }
+          const token = req.headers.authorization.split(" ")[1];
+          jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+            if(err) return res.status(401).send({message: "unauthorized access"});
+            req.decoded = decoded;
+            next()  
+          })
+          
+        }
+    
+        //verify admin middleware 
+    
+        const verifyAdmin = async(req, res, next) => {
+    
+          const email = req.decoded.email;
+    
+          const query = {email};
+          const result = await usersCollection.findOne(query)
+          const isAdmin = result?.role === 'admin';
+          if(!isAdmin) return res.status(403).send({message: "forbidden access"}) 
+    
+            next()
+    
+        }
+
+        // make jwt token 
+    
+        app.post("/jwt", async( req, res) => {
+          const user = req.body;
+          const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'})
+          res.send({token})
+        })
+    
+    
+    
+
+
 
     // news collection related apis here 
 
@@ -55,6 +102,18 @@ async function run() {
             const result = await newsCollection.find().toArray()
             res.send(result)
         })
+
+        // get specific item from news collection
+
+        app.get('/news/:id', async(req, res) => {
+
+          const id = req.params.id;
+    
+          const query = {_id: new ObjectId(id)};
+    
+          const result = await newsCollection.findOne(query)
+          res.send(result)
+      })
 
 
 
