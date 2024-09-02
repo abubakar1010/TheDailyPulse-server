@@ -39,6 +39,8 @@ async function run() {
 
         // middleware 
 
+        // middleware 
+
         const verifyToken = (req, res, next) => {
           // console.log("verify token",req.headers.authorization);
     
@@ -54,20 +56,7 @@ async function run() {
           
         }
     
-        //verify admin middleware 
-    
-        const verifyAdmin = async(req, res, next) => {
-    
-          const email = req.decoded.email;
-    
-          const query = {email};
-          const result = await usersCollection.findOne(query)
-          const isAdmin = result?.role === 'admin';
-          if(!isAdmin) return res.status(403).send({message: "forbidden access"}) 
-    
-            next()
-    
-        }
+
 
         // make jwt token 
     
@@ -90,6 +79,25 @@ async function run() {
           res.send(result)
         })
 
+        //admin user 
+
+        app.get("/users/admin/:email",verifyToken, async(req, res) => {
+
+          const email = req.params.email;
+          
+          if(email !== req.decoded.email) return res.status(403).send({message: "forbidden access"})
+          const filter = {email: email};
+          const result = await usersCollection.findOne(filter)
+    
+          
+    
+          let admin = false;
+          if(result){
+            admin = result?.role === 'admin'
+          }
+          res.send({admin})
+        } )
+
         // insert a user
 
         app.post('/users', async(req, res) => {
@@ -111,7 +119,7 @@ async function run() {
 
       const id = req.params.id;
       const query = {_id: new ObjectId(id)}
-      const result = await cartsCollection.deleteOne(query)
+      const result = await usersCollection.deleteOne(query)
       res.send(result)
 
     })
