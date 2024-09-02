@@ -56,7 +56,20 @@ async function run() {
           
         }
     
-
+        //verify admin middleware 
+    
+        const verifyAdmin = async(req, res, next) => {
+    
+          const email = req.decoded.email;
+    
+          const query = {email};
+          const result = await usersCollection.findOne(query)
+          const isAdmin = result?.role === 'admin';
+          if(!isAdmin) return res.status(403).send({message: "forbidden access"})
+    
+            next()
+    
+        }
 
         // make jwt token 
     
