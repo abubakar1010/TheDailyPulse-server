@@ -87,6 +87,23 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/users/length", async (req, res) => {
+      // console.log(req.headers);
+
+      const query = { isPremium: true };
+
+      const allUser = await usersCollection.find().toArray();
+      const allPremiumUsers = await usersCollection.find(query).toArray();
+
+      const totalUsers = allUser.length;
+      const premiumUsers = allPremiumUsers.length;
+      const normalUsers = totalUsers - premiumUsers;
+
+      // console.log(typeof(totalUsers));
+
+      res.send({ totalUsers, premiumUsers, normalUsers });
+    });
+
     //admin user
 
     app.get("/users/admin/:email", verifyToken, async (req, res) => {
@@ -156,16 +173,18 @@ async function run() {
 
       const filter = { name: data.publisher };
       console.log(filter);
-      
+
       const update = {
         $inc: {
           totalNews: 1,
         },
       };
-        const publisherResult = await publishersCollection.updateOne(filter, update);
-        console.log(publisherResult);
-        
-      
+      const publisherResult = await publishersCollection.updateOne(
+        filter,
+        update
+      );
+      console.log(publisherResult);
+
       const result = await newsCollection.insertOne(data);
       res.send(result);
     });
@@ -181,7 +200,7 @@ async function run() {
     // find all news from news collection
 
     app.get("/news/status", async (req, res) => {
-      const query = {status: "Approved"}
+      const query = { status: "Approved" };
       const result = await newsCollection.find(query).toArray();
       res.send(result);
     });
@@ -207,11 +226,10 @@ async function run() {
       res.send({ result, update });
     });
 
-
     // get top 6 trending articles
 
     app.get("/trendingNews", async (req, res) => {
-      const query = {status: "Approved"}
+      const query = { status: "Approved" };
       const trendingNews = await newsCollection
         .find(query)
         .sort({ views: -1 })
@@ -221,8 +239,7 @@ async function run() {
       res.send(trendingNews);
     });
 
-
-    //update news status 
+    //update news status
 
     app.patch(
       "/news/updateStatus/:id",
@@ -232,7 +249,7 @@ async function run() {
         const id = req.params.id;
         const data = req.body;
         // console.log("id = ", id, "status = ", status);
-        
+
         const filter = { _id: new ObjectId(id) };
         const updatedDocs = {
           $set: {
@@ -244,29 +261,27 @@ async function run() {
       }
     );
 
+    //insert publisher on publisher collection
 
-        //insert publisher on publisher collection
+    app.post("/publisher", async (req, res) => {
+      const data = req.body;
+      const result = await publishersCollection.insertOne(data);
+      res.send(result);
+    });
 
-        app.post("/publisher", async (req, res) => {
-          const data = req.body;
-          const result = await publishersCollection.insertOne(data);
-          res.send(result);
-        });
-
-            // find all publishers from publishers collection
+    // find all publishers from publishers collection
 
     app.get("/publisher", async (req, res) => {
       const result = await publishersCollection.find().toArray();
       res.send(result);
     });
 
-
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
-  } finally {
+  } finally { 
     // Ensures that the client will close when you finish/error
     // await client.close();
   }
