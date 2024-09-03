@@ -231,6 +231,14 @@ async function run() {
     );
 
 
+        //insert publisher on publisher collection
+
+        app.post("/publisher", async (req, res) => {
+          const data = req.body;
+          const result = await publishersCollection.insertOne(data);
+          res.send(result);
+        });
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
