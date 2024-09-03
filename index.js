@@ -164,6 +164,13 @@ async function run() {
       const result = await newsCollection.find().toArray();
       res.send(result);
     });
+    // find all news from news collection
+
+    app.get("/news/status", async (req, res) => {
+      const query = {status: "Approved"}
+      const result = await newsCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // get specific item from news collection
 
@@ -190,8 +197,9 @@ async function run() {
     // get top 6 trending articles
 
     app.get("/trendingNews", async (req, res) => {
+      const query = {status: "Approved"}
       const trendingNews = await newsCollection
-        .find({})
+        .find(query)
         .sort({ views: -1 })
         .limit(6)
         .toArray();
