@@ -200,7 +200,27 @@ async function run() {
     });
 
 
+    //update news status 
 
+    app.patch(
+      "/news/updateStatus/:id",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        const id = req.params.id;
+        const data = req.body;
+        // console.log("id = ", id, "status = ", status);
+        
+        const filter = { _id: new ObjectId(id) };
+        const updatedDocs = {
+          $set: {
+            status: data.status,
+          },
+        };
+        const result = await newsCollection.updateOne(filter, updatedDocs);
+        res.send(result);
+      }
+    );
 
 
 
