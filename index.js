@@ -152,6 +152,20 @@ async function run() {
 
     app.post("/news", async (req, res) => {
       const data = req.body;
+      // console.log(data);
+
+      const filter = { name: data.publisher };
+      console.log(filter);
+      
+      const update = {
+        $inc: {
+          totalNews: 1,
+        },
+      };
+        const publisherResult = await publishersCollection.updateOne(filter, update);
+        console.log(publisherResult);
+        
+      
       const result = await newsCollection.insertOne(data);
       res.send(result);
     });
