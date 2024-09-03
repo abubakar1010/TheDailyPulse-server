@@ -187,6 +187,19 @@ async function run() {
     });
 
 
+    // get top 6 trending articles
+
+    app.get("/trendingNews", async (req, res) => {
+      const trendingNews = await newsCollection
+        .find({})
+        .sort({ views: -1 })
+        .limit(6)
+        .toArray();
+
+      res.send(trendingNews);
+    });
+
+
 
 
 
