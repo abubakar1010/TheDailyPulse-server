@@ -163,6 +163,18 @@ async function run() {
       }
     );
 
+    app.patch("/users/payment/:email", async (req, res) => {
+      const email = req.params.email;
+      const filter = { email };
+      const updatedDocs = {
+        $set: {
+          isPremium: true,
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updatedDocs);
+      res.send(result);
+    });
+
     // news collection related apis here
 
     //insert item on new
@@ -198,6 +210,15 @@ async function run() {
       res.send(result);
     });
     // find all news from news collection
+
+    app.get("/news/user/:email", async (req, res) => {
+      const emailId = req.params.email;
+      // console.log(emailId);
+
+      const query = { authorEmail: emailId };
+      const result = await newsCollection.find(query).toArray();
+      res.send(result);
+    });
 
     app.get("/news/status", async (req, res) => {
       const query = { status: "Approved" };
@@ -261,6 +282,36 @@ async function run() {
       }
     );
 
+    //delete news
+    app.delete("/news/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await newsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    //update news
+
+    app.patch("/news/:id", async (req, res) => {
+      const id = req.params.id;
+      // console.log("id ---> ",id);
+      // console.log("data ----> ", req.body);
+
+      const { title, tags, publisher, description, image } = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDocs = {
+        $set: {
+          title,
+          tags,
+          publisher,
+          description,
+          image,
+        },
+      };
+      const result = await newsCollection.updateOne(filter, updatedDocs);
+      res.send(result);
+    });
+
     //insert publisher on publisher collection
 
     app.post("/publisher", async (req, res) => {
@@ -281,7 +332,7 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
-  } finally { 
+  } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
   }
