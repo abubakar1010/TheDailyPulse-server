@@ -103,6 +103,16 @@ async function run() {
 
       res.send({ totalUsers, premiumUsers, normalUsers });
     });
+    app.get("/premiumUser/:email", async (req, res) => {
+
+      const emailId = req.params.email
+      const query = { email: emailId };
+      console.log(query);
+      
+
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
 
     //admin user
 
@@ -222,14 +232,18 @@ async function run() {
 
     app.get("/news/status", async (req, res) => {
       const query = { status: "Approved" };
+      
       const result = await newsCollection.find(query).toArray();
       res.send(result);
     });
+
     app.get("/news/premium", async (req, res) => {
       const query = { subscription: true };
       const result = await newsCollection.find(query).toArray();
       res.send(result);
     });
+
+
 
     // get specific item from news collection
 
