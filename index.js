@@ -87,7 +87,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/users/length", async (req, res) => {
+    app.get("/length", async (req, res) => {
       // console.log(req.headers);
 
       const query = { isPremium: true };
@@ -173,7 +173,7 @@ async function run() {
       }
     );
 
-    app.patch("/users/payment/:email", async (req, res) => {
+    app.patch("/users/payment/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       const filter = { email };
       const updatedDocs = {
@@ -189,7 +189,7 @@ async function run() {
 
     //insert item on new
 
-    app.post("/news", async (req, res) => {
+    app.post("/news", verifyToken, async (req, res) => {
       const data = req.body;
       // console.log(data);
 
@@ -221,7 +221,7 @@ async function run() {
     });
     // find all news from news collection
 
-    app.get("/news/user/:email", async (req, res) => {
+    app.get("/news/user/:email", verifyToken, verifyAdmin, async (req, res) => {
       const emailId = req.params.email;
       // console.log(emailId);
 
@@ -237,7 +237,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/news/premium", async (req, res) => {
+    app.get("/news/premium", verifyToken, async (req, res) => {
       const query = { subscription: true };
       const result = await newsCollection.find(query).toArray();
       res.send(result);
@@ -327,7 +327,7 @@ async function run() {
     );
 
     //delete news
-    app.delete("/news/:id", async (req, res) => {
+    app.delete("/news/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await newsCollection.deleteOne(query);
@@ -336,7 +336,7 @@ async function run() {
 
     //update news
 
-    app.patch("/news/:id", async (req, res) => {
+    app.patch("/news/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       // console.log("id ---> ",id);
       // console.log("data ----> ", req.body);
@@ -358,7 +358,7 @@ async function run() {
 
     //insert publisher on publisher collection
 
-    app.post("/publisher", async (req, res) => {
+    app.post("/publisher", verifyToken, verifyAdmin, async (req, res) => {
       const data = req.body;
       const result = await publishersCollection.insertOne(data);
       res.send(result);
