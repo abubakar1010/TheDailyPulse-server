@@ -243,7 +243,22 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/news/title/:name", async (req, res) => {
+      const name = req.params.name;
+      // console.log(name);
+      const query = { title: { $regex: new RegExp(name, "i") } };
+      const result = await newsCollection.find(query).toArray();
 
+      res.send(result);
+    });
+    app.get("/news/publisher/:name", async (req, res) => {
+      const name = req.params.name;
+      // console.log(name);
+      const query = { publisher: { $regex: new RegExp(name, "i") } };
+      const result = await newsCollection.find(query).toArray();
+
+      res.send(result);
+    });
 
     // get specific item from news collection
 
