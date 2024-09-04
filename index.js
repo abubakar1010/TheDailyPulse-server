@@ -225,6 +225,11 @@ async function run() {
       const result = await newsCollection.find(query).toArray();
       res.send(result);
     });
+    app.get("/news/premium", async (req, res) => {
+      const query = { subscription: true };
+      const result = await newsCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // get specific item from news collection
 
@@ -272,11 +277,21 @@ async function run() {
         // console.log("id = ", id, "status = ", status);
 
         const filter = { _id: new ObjectId(id) };
-        const updatedDocs = {
-          $set: {
-            status: data.status,
-          },
-        };
+        let updatedDocs = {};
+        if(data.status == "premium"){
+
+           updatedDocs = {
+            $set: {
+              subscription: true,
+            },
+          };
+        }else{
+           updatedDocs = {
+            $set: {
+              status: data.status,
+            },
+          };
+        }
         const result = await newsCollection.updateOne(filter, updatedDocs);
         res.send(result);
       }
